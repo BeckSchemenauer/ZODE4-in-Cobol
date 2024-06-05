@@ -38,7 +38,6 @@ WORKING-STORAGE SECTION.
 PROCEDURE DIVISION.
     DISPLAY "Starting interpreter test cases..."
 
-    PERFORM TEST-IFC
     PERFORM TEST-APPC
 
     STOP RUN.
@@ -76,8 +75,8 @@ TEST-IFC SECTION.
 TEST-APPC SECTION.
     MOVE "AppC" TO NODE-TYPE
     MOVE "PrimOp" TO EXP
-    MOVE "+" TO SYM
-    MOVE 5 TO ARG-N(1)
+    MOVE "-" TO SYM
+    MOVE 50 TO ARG-N(1)
     MOVE 10 TO ARG-N(2)
     PERFORM INTERP
     DISPLAY "Result of APPC interpretation: " VAR-Z.
@@ -101,6 +100,9 @@ INTERP SECTION.
            IF SYM = "+"
                COMPUTE VAR-Z = ARG-N(1) + ARG-N(2)
            END-IF
+           IF SYM = "-"
+               COMPUTE VAR-Z = ARG-N(1) - ARG-N(2)
+           END-IF
        WHEN OTHER
            DISPLAY "Unknown node type: " NODE-TYPE
    END-EVALUATE.
@@ -108,3 +110,4 @@ INTERP SECTION.
    DISPLAY "Result: " VAR-Z.
 
    STOP RUN.
+   
