@@ -75,7 +75,7 @@ TEST-IFC SECTION.
 TEST-APPC SECTION.
     MOVE "AppC" TO NODE-TYPE
     MOVE "PrimOp" TO EXP
-    MOVE "-" TO SYM
+    MOVE "*" TO SYM
     MOVE 50 TO ARG-N(1)
     MOVE 10 TO ARG-N(2)
     PERFORM INTERP
@@ -102,6 +102,9 @@ INTERP SECTION.
            END-IF
            IF SYM = "-"
                COMPUTE VAR-Z = ARG-N(1) - ARG-N(2)
+           END-IF
+           IF SYM = "*"
+               MULTIPLY ARG-N(1) BY ARG-N(2) GIVING VAR-Z
            END-IF
        WHEN OTHER
            DISPLAY "Unknown node type: " NODE-TYPE
