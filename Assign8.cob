@@ -4,7 +4,6 @@ PROGRAM-ID. INTERPRETER-TESTS.
 DATA DIVISION.
 WORKING-STORAGE SECTION.
 01 VAR-Z PIC S9(9)V99 VALUE 0.
-
 01 VAR-S PIC X(100).
 
 01 AST-NODE.
@@ -34,6 +33,17 @@ WORKING-STORAGE SECTION.
 
 01 PRIM-OP-STRUCT.
    05 SYM PIC X(10).
+
+01 CLOS-V-STRUCT.
+   05 ARGS OCCURS 10 TIMES.
+      10 ARG-S PIC X(50).
+   05 BODY PIC X(50).
+   05 CLOS-ENV PIC X(50).
+
+01 BINDINGS OCCURS 10 TIMES.
+   05 BINDING.
+      10 BIND-NAME PIC X(50).
+      10 BIND-VALUE PIC X(50).
 
 PROCEDURE DIVISION.
     DISPLAY "Starting interpreter test cases..."
@@ -97,23 +107,44 @@ INTERP SECTION.
                COMPUTE VAR-Z = ELSE-EXPR-N
            END-IF
        WHEN "AppC"
-           IF SYM = "+"
-               COMPUTE VAR-Z = ARG-N(1) + ARG-N(2)
-           END-IF
-           IF SYM = "-"
-               COMPUTE VAR-Z = ARG-N(1) - ARG-N(2)
-           END-IF
-           IF SYM = "*"
-               MULTIPLY ARG-N(1) BY ARG-N(2) GIVING VAR-Z
-           END-IF
-           IF SYM = "/"
-               DIVIDE ARG-N(2) INTO ARG-N(1) GIVING VAR-Z
-           END-IF
+           PERFORM APPLY-FUNCTION
        WHEN OTHER
            DISPLAY "Unknown node type: " NODE-TYPE
    END-EVALUATE.
    DISPLAY "Result String: " VAR-S.
    DISPLAY "Result: " VAR-Z.
-
    STOP RUN.
-   
+
+APPLY-FUNCTION SECTION.
+   MOVE "Interpreting function application" TO VAR-S
+   PERFORM INTERP-FUN
+   IF SYM = "+"
+       COMPUTE VAR-Z = ARG-N(1) + ARG-N(2)
+   END-IF
+   IF SYM = "-"
+       COMPUTE VAR-Z = ARG-N(1) - ARG-N(2)
+   END-IF
+   IF SYM = "*"
+       MULTIPLY ARG-N(1) BY ARG-N(2) GIVING VAR-Z
+   END-IF
+   IF SYM = "/"
+       DIVIDE ARG-N(1) BY ARG-N(2) GIVING VAR-Z
+   END-IF
+   EXIT.
+
+INTERP-FUN SECTION.
+   DISPLAY "Interpreting function..."
+   EVALUATE EXP
+       WHEN "PrimOp"
+           DISPLAY "Primitive operation: " SYM
+       WHEN "closV"
+           DISPLAY "Closure application"
+           PERFORM APPLY-CLOSURE
+       WHEN OTHER
+           DISPLAY "Unknown function type: " EXP
+   END-EVALUATE.
+
+APPLY-CLOSURE SECTION.
+   DISPLAY "Applying closure with arguments"
+   MOVE 0 TO VAR-Z
+   EXIT.
