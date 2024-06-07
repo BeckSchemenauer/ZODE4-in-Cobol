@@ -5,6 +5,7 @@ DATA DIVISION.
 WORKING-STORAGE SECTION.
 01 VAR-Z PIC S9(9)V99 VALUE 0.
 01 VAR-S PIC X(100).
+01 IDX PIC 9(2) VALUE 1.
 
 01 AST-NODE.
    05 NODE-TYPE PIC X(10).
@@ -120,15 +121,14 @@ APPLY-FUNCTION SECTION.
    PERFORM INTERP-FUN
    IF SYM = "+"
        COMPUTE VAR-Z = ARG-N(1) + ARG-N(2)
-   END-IF
-   IF SYM = "-"
+   ELSE IF SYM = "-"
        COMPUTE VAR-Z = ARG-N(1) - ARG-N(2)
-   END-IF
-   IF SYM = "*"
+   ELSE IF SYM = "*"
        MULTIPLY ARG-N(1) BY ARG-N(2) GIVING VAR-Z
-   END-IF
-   IF SYM = "/"
+   ELSE IF SYM = "/"
        DIVIDE ARG-N(1) BY ARG-N(2) GIVING VAR-Z
+   ELSE
+       PERFORM LOOKUP-FUNCTION
    END-IF
    EXIT.
 
@@ -147,4 +147,19 @@ INTERP-FUN SECTION.
 APPLY-CLOSURE SECTION.
    DISPLAY "Applying closure with arguments"
    MOVE 0 TO VAR-Z
+   EXIT.
+
+LOOKUP-FUNCTION SECTION.
+   MOVE 0 TO VAR-Z
+   PERFORM VARYING IDX FROM 1 BY 1 UNTIL IDX > 10
+       IF BIND-NAME(IDX) = SYM
+           MOVE BIND-VALUE(IDX) TO VAR-S
+           EXIT PERFORM
+       END-IF
+   END-PERFORM
+   IF VAR-S = SPACES
+       DISPLAY "Function " SYM " not found in environment."
+   ELSE
+       DISPLAY "Function " SYM " found with value: " VAR-S
+   END-IF
    EXIT.
