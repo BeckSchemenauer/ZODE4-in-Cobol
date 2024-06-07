@@ -118,7 +118,6 @@ INTERP SECTION.
 
 APPLY-FUNCTION SECTION.
    MOVE "Interpreting function application" TO VAR-S
-   PERFORM INTERP-FUN
    IF SYM = "+"
        COMPUTE VAR-Z = ARG-N(1) + ARG-N(2)
    ELSE IF SYM = "-"
@@ -132,17 +131,6 @@ APPLY-FUNCTION SECTION.
    END-IF
    EXIT.
 
-INTERP-FUN SECTION.
-   DISPLAY "Interpreting function..."
-   EVALUATE EXP
-       WHEN "PrimOp"
-           DISPLAY "Primitive operation: " SYM
-       WHEN "closV"
-           DISPLAY "Closure application"
-           PERFORM APPLY-CLOSURE
-       WHEN OTHER
-           DISPLAY "Unknown function type: " EXP
-   END-EVALUATE.
 
 APPLY-CLOSURE SECTION.
    DISPLAY "Applying closure with arguments"
